@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RusCog - ロシア語同根語学習</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RusCog">
+  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
+  <meta name="theme-color" content="#1e1e2f">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.2s, border-color 0.2s;
+    }
+
+    /* デフォルト: ダークモード */
+    :root {
+      --bg: #1e1e2f;
+      --surface: #2a2a3b;
+      --text: #f0f0f0;
+      --text-muted: #bcbcbc;
+      --primary: #7c4dff;
+      --primary-hover: #9a67ff;
+      --border: #3a3a4f;
+      --card-bg: #2d2d3f;
+    }
+
+    body.light {
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #4a4a5a;
+      --primary: #5e35b1;
+      --primary-hover: #7e57c2;
+      --border: #d0d0dd;
+      --card-bg: #ffffff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      line-height: 1.5;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* ヘッダー・フッターは固定しない（通常のブロック） */
+    header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .mode-bar {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      background-color: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.9rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .primary-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .category-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin: 1.5rem 0;
+    }
+
+    .category-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.2s;
+    }
+
+    .category-card:hover {
+      transform: scale(1.01);
+      background-color: var(--surface);
+      border-color: var(--primary);
+    }
+
+    .category-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .category-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* 詳細ページ */
+    .detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      background: none;
+      font-size: 1.5rem;
+      padding: 0 0.5rem;
+      border: none;
+    }
+
+    .word-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .word-item {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .word-text {
+      flex: 1;
+    }
+
+    .word-eng {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .word-rus {
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      color: var(--primary);
+      margin-left: 0.75rem;
+    }
+
+    .word-jp {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-left: 0.75rem;
+    }
+
+    .speak-btn {
+      background: var(--surface);
+      border-radius: 2rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    @media (max-width: 500px) {
+      .word-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .speak-btn {
+        align-self: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <!-- 動的にビュー切り替え -->
+</div>
+<footer>
+  Contact us<br>
+  <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a>
+</footer>
+
+<script>
+  // ---------- 単語データ (カテゴリ別, 英語・ロシア語・日本語+ローマ字) ----------
+  const WORDS = [
+    // -ция / -tion グループ
+    { eng: "station", rus: "станция", jp: "駅 (えき)", jp_roman: "eki", category: "-ция / -tion (станция)" },
+    { eng: "information", rus: "информация", jp: "情報 (じょうほう)", jp_roman: "jōhō", category: "-ция / -tion" },
+    { eng: "administration", rus: "администрация", jp: "行政 (ぎょうせい)", jp_roman: "gyōsei", category: "-ция / -tion" },
+    { eng: "association", rus: "ассоциация", jp: "協会 (きょうかい)", jp_roman: "kyōkai", category: "-ция / -tion" },
+    { eng: "collection", rus: "коллекция", jp: "コレクション", jp_roman: "korekushon", category: "-ция / -tion" },
+    { eng: "conference", rus: "конференция", jp: "会議 (かいぎ)", jp_roman: "kaigi", category: "-ция / -tion" },
+    { eng: "construction", rus: "конструкция", jp: "構造 (こうぞう)", jp_roman: "kōzō", category: "-ция / -tion" },
+    { eng: "nation", rus: "нация", jp: "国民 (こくみん)", jp_roman: "kokumin", category: "-ция / -tion" },
+    { eng: "operation", rus: "операция", jp: "手術・作戦 (しゅじゅつ・さくせん)", jp_roman: "shujutsu/sakusen", category: "-ция / -tion" },
+    { eng: "organization", rus: "организация", jp: "組織 (そしき)", jp_roman: "soshiki", category: "-ция / -tion" },
+    { eng: "presentation", rus: "презентация", jp: "発表 (はっぴょう)", jp_roman: "happyō", category: "-ция / -tion" },
+    { eng: "reaction", rus: "реакция", jp: "反応 (はんのう)", jp_roman: "hannō", category: "-ция / -tion" },
+    { eng: "situation", rus: "ситуация", jp: "状況 (じょうきょう)", jp_roman: "jōkyō", category: "-ция / -tion" },
+    { eng: "tradition", rus: "традиция", jp: "伝統 (でんとう)", jp_roman: "dentō", category: "-ция / -tion" },
+    { eng: "civilization", rus: "цивилизация", jp: "文明 (ぶんめい)", jp_roman: "bunmei", category: "-ция / -tion" },
+    // -сия / -sion
+    { eng: "session", rus: "сессия", jp: "会期・試験期間 (かいき・しけんきかん)", jp_roman: "kaiki/shikenkikan", category: "-сия / -sion" },
+    { eng: "commission", rus: "комиссия", jp: "委員会 (いいんかい)", jp_roman: "iinkai", category: "-сия / -sion" },
+    { eng: "discussion", rus: "дискуссия", jp: "議論 (ぎろん)", jp_roman: "giron", category: "-сия / -sion" },
+    // -y / -ogy
+    { eng: "allergy", rus: "аллергия", jp: "アレルギー", jp_roman: "arerugī", category: "-ия / -y" },
+    { eng: "biology", rus: "биология", jp: "生物学 (せいぶつがく)", jp_roman: "seibutsugaku", category: "-ия / -y" },
+    { eng: "geography", rus: "география", jp: "地理 (ちり)", jp_roman: "chiri", category: "-ия / -y" },
+    { eng: "history", rus: "история", jp: "歴史 (れきし)", jp_roman: "rekishi", category: "-ия / -y" },
+    { eng: "category", rus: "категория", jp: "カテゴリー", jp_roman: "kategorī", category: "-ия / -y" },
+    { eng: "psychology", rus: "психология", jp: "心理学 (しんりがく)", jp_roman: "shinrigaku", category: "-ия / -y" },
+    { eng: "strategy", rus: "стратегия", jp: "戦略 (せんりゃく)", jp_roman: "senryaku", category: "-ия / -y" },
+    { eng: "technology", rus: "технология", jp: "技術 (ぎじゅつ)", jp_roman: "gijutsu", category: "-ия / -y" },
+    { eng: "philosophy", rus: "философия", jp: "哲学 (てつがく)", jp_roman: "tetsugaku", category: "-ия / -y" },
+    { eng: "photography", rus: "фотография", jp: "写真 (しゃしん)", jp_roman: "shashin", category: "-ия / -y" },
+    { eng: "democracy", rus: "демократия", jp: "民主主義 (みんしゅしゅぎ)", jp_roman: "minshushugi", category: "-ия / -y" },
+    { eng: "energy", rus: "энергия", jp: "エネルギー", jp_roman: "enerugī", category: "-ия / -y" },
+    // -y (symphony, tragedy)
+    { eng: "symphony", rus: "симфония", jp: "交響曲 (こうきょうきょく)", jp_roman: "kōkyōkyoku", category: "-ия / -y" },
+    { eng: "tragedy", rus: "трагедия", jp: "悲劇 (ひげき)", jp_roman: "higeki", category: "-ия / -y" },
+    // -em / -ema
+    { eng: "problem", rus: "проблема", jp: "問題 (もんだい)", jp_roman: "mondai", category: "-ема / -em" },
+    { eng: "system", rus: "система", jp: "システム", jp_roman: "shisutemu", category: "-ема / -em" },
+    { eng: "program", rus: "программа", jp: "プログラム", jp_roman: "puroguramu", category: "-ема / -em" },
+    { eng: "drama", rus: "драма", jp: "ドラマ", jp_roman: "dorama", category: "-ема / -em" },
+    { eng: "dogma", rus: "догма", jp: "教義 (きょうぎ)", jp_roman: "kyōgi", category: "-ема / -em" },
+    { eng: "dilemma", rus: "дилемма", jp: "ジレンマ", jp_roman: "jirenma", category: "-ема / -em" },
+    { eng: "coma", rus: "кома", jp: "昏睡 (こんすい)", jp_roman: "konsui", category: "-ема / -em" },
+    { eng: "panorama", rus: "панорама", jp: "パノラマ", jp_roman: "panorama", category: "-ема / -em" },
+    { eng: "poem", rus: "поэма", jp: "詩 (し)", jp_roman: "shi", category: "-ема / -em" },
+    { eng: "schema", rus: "схема", jp: "図式 (ずしき)", jp_roman: "zushiki", category: "-ема / -em" },
+    { eng: "theorem", rus: "теорема", jp: "定理 (ていり)", jp_roman: "teiri", category: "-ема / -em" },
+    { eng: "trauma", rus: "травма", jp: "外傷・トラウマ (がいしょう)", jp_roman: "gaishō/torau", category: "-ема / -em" },
+    { eng: "emblem", rus: "эмблема", jp: "エンブレム", jp_roman: "enburemu", category: "-ема / -em" },
+    // その他 common
+    { eng: "address", rus: "адрес", jp: "住所 (じゅうしょ)", jp_roman: "jūsho", category: "その他・共通" },
+    { eng: "bank", rus: "банк", jp: "銀行 (ぎんこう)", jp_roman: "ginkō", category: "その他・共通" },
+    { eng: "group", rus: "группа", jp: "グループ", jp_roman: "gurūpu", category: "その他・共通" },
+    { eng: "doctor", rus: "доктор", jp: "医者 (いしゃ)", jp_roman: "isha", category: "その他・共通" },
+    { eng: "document", rus: "документ", jp: "書類 (しょるい)", jp_roman: "shorui", category: "その他・共通" },
+    { eng: "internet", rus: "интернет", jp: "インターネット", jp_roman: "intānetto", category: "その他・共通" },
+    { eng: "camera", rus: "камера", jp: "カメラ", jp_roman: "kamera", category: "その他・共通" },
+    { eng: "computer", rus: "компьютер", jp: "コンピュータ", jp_roman: "konpyūta", category: "その他・共通" },
+    { eng: "minute", rus: "минута", jp: "分 (ふん)", jp_roman: "fun", category: "その他・共通" },
+    { eng: "museum", rus: "музей", jp: "博物館 (はくぶつかん)", jp_roman: "hakubutsukan", category: "その他・共通" },
+    { eng: "music", rus: "музыка", jp: "音楽 (おんがく)", jp_roman: "ongaku", category: "その他・共通" },
+    { eng: "passport", rus: "паспорт", jp: "パスポート", jp_roman: "pasupōto", category: "その他・共通" },
+    { eng: "professor", rus: "профессор", jp: "教授 (きょうじゅ)", jp_roman: "kyōju", category: "その他・共通" },
+    { eng: "radio", rus: "радио", jp: "ラジオ", jp_roman: "rajio", category: "その他・共通" },
+    { eng: "restaurant", rus: "ресторан", jp: "レストラン", jp_roman: "resutoran", category: "その他・共通" },
+    { eng: "second", rus: "секунда", jp: "秒 (びょう)", jp_roman: "byō", category: "その他・共通" },
+    { eng: "sport", rus: "спорт", jp: "スポーツ", jp_roman: "supōtsu", category: "その他・共通" },
+    { eng: "student", rus: "студент", jp: "学生 (がくせい)", jp_roman: "gakusei", category: "その他・共通" },
+    { eng: "taxi", rus: "такси", jp: "タクシー", jp_roman: "takushī", category: "その他・共通" },
+    { eng: "telephone", rus: "телефон", jp: "電話 (でんわ)", jp_roman: "denwa", category: "その他・共通" },
+    { eng: "tourist", rus: "турист", jp: "旅行者 (りょこうしゃ)", jp_roman: "ryokōsha", category: "その他・共通" },
+    { eng: "university", rus: "университет", jp: "大学 (だいがく)", jp_roman: "daigaku", category: "その他・共通" },
+    { eng: "festival", rus: "фестиваль", jp: "祭り (まつり)", jp_roman: "matsuri", category: "その他・共通" },
+    { eng: "film", rus: "фильм", jp: "映画 (えいが)", jp_roman: "eiga", category: "その他・共通" },
+    { eng: "center", rus: "центр", jp: "センター", jp_roman: "sentā", category: "その他・共通" },
+    // 偽りの友 (False Friends)
+    { eng: "magazine", rus: "магазин", jp: "店・お店 (みせ)", jp_roman: "mise", category: "偽りの友 (false friends)" },
+    { eng: "actual", rus: "актуальный", jp: "時宜を得た (じぎをえた)", jp_roman: "jigi o eta", category: "偽りの友" },
+    { eng: "accurate", rus: "аккуратный", jp: "几帳面な (きちょうめんな)", jp_roman: "kichōmenna", category: "偽りの友" },
+    { eng: "family", rus: "фамилия", jp: "名字 (みょうじ)", jp_roman: "myōji", category: "偽りの友" },
+    { eng: "artist", rus: "артист", jp: "俳優・芸能人 (はいゆう・げいのうじん)", jp_roman: "haiyū/geinōjin", category: "偽りの友" },
+    { eng: "insult", rus: "инсульт", jp: "脳卒中 (のうそっちゅう)", jp_roman: "nōsotchū", category: "偽りの友" },
+    { eng: "troop", rus: "труп", jp: "死体 (したい)", jp_roman: "shitai", category: "偽りの友" },
+    { eng: "cabinet", rus: "кабинет", jp: "書斎・診察室 (しょさい・しんさつしつ)", jp_roman: "shosai/shinsatsushitsu", category: "偽りの友" },
+  ];
+
+  // ユニークなカテゴリを抽出 (表示用)
+  const categories = [...new Map(WORDS.map(w => [w.category, true])).keys()];
+  
+  // 表示モード: 'eng_rus' または 'all'
+  let displayMode = 'eng_rus';   // 'eng_rus' = 英語→ロシア語, 'all' = 英・露・日(ローマ字)
+  let darkMode = true; // ダークデフォルト
+
+  // 現在のビュー: 'main' or 'detail'
+  let currentView = 'main';
+  let currentCategory = '';
+
+  // DOM 要素
+  const appDiv = document.getElementById('app');
+
+  // 音声読み上げ (ロシア語)
+  function speakRussian(text) {
+    if (!window.speechSynthesis) {
+      alert("お使いのブラウザは音声合成に対応していません");
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ru-RU';
+    utterance.rate = 0.9;
+    window.speechSynthesis.cancel(); // 重複防止
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // 単語の表示テキストをモードに応じて生成
+  function getWordDisplay(word) {
+    if (displayMode === 'eng_rus') {
+      return `${word.eng} → ${word.rus}`;
+    } else {
+      // 英語、ロシア語、日本語（ローマ字付き）
+      return `${word.eng}  •  ${word.rus}  •  ${word.jp} (${word.jp_roman})`;
+    }
+  }
+
+  // メインビュー (カテゴリーリスト)
+  function renderMainView() {
+    let html = `
+      <header>
+        <div class="title-row">
+          <h1 id="mainTitle">📖 RusCog</h1>
+          <button id="darkModeToggle" class="primary-btn">🌙 ダーク</button>
+        </div>
+        <div class="mode-bar">
+          <button id="modeEngRusBtn" class="${displayMode === 'eng_rus' ? 'primary-btn' : ''}">🇬🇧→🇷🇺 (英露)</button>
+          <button id="modeAllBtn" class="${displayMode === 'all' ? 'primary-btn' : ''}">🌍 英・露・日+ローマ字</button>
+        </div>
+      </header>
+      <h2>📂 語尾・カテゴリ別リスト</h2>
+      <div class="category-grid">
+    `;
+    categories.forEach(cat => {
+      const count = WORDS.filter(w => w.category === cat).length;
+      html += `
+        <div class="category-card" data-category="${escapeHtml(cat)}">
+          <div class="category-title">${escapeHtml(cat)}</div>
+          <div class="category-sub">${count} 単語</div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    appDiv.innerHTML = html;
+
+    // イベント設定
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        const cat = card.getAttribute('data-category');
+        showDetailView(cat);
+      });
+    });
+    document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('modeEngRusBtn').addEventListener('click', () => setDisplayMode('eng_rus'));
+    document.getElementById('modeAllBtn').addEventListener('click', () => setDisplayMode('all'));
+    updateTitleByMode();
+  }
+
+  // 詳細ビュー (カテゴリ内単語をアルファベット順)
+  function showDetailView(category) {
+    currentCategory = category;
+    const filtered = WORDS.filter(w => w.category === category);
+    filtered.sort((a,b) => a.eng.localeCompare(b.eng));
+    
+    let html = `
+      <div class="detail-header">
+        <button id="backBtn" class="back-btn">← 戻る</button>
+        <h2>📌 ${escapeHtml(category)}</h2>
+        <button id="darkModeToggleDetail" class="primary-btn" style="margin-left:auto;">🌙 ダーク</button>
+      </div>
+      <div class="mode-bar" style="margin-bottom:1rem;">
+        <button id="modeEngRusDetail" class="${displayMode === 'eng_rus' ? 'primary-btn' : ''}">🇬🇧→🇷🇺 (英露)</button>
+        <button id="modeAllDetail" class="${displayMode === 'all' ? 'primary-btn' : ''}">🌍 英・露・日+ローマ字</button>
+      </div>
+      <div class="word-list">
+    `;
+    filtered.forEach(word => {
+      const displayText = getWordDisplay(word);
+      html += `
+        <div class="word-item">
+          <div class="word-text">${escapeHtml(displayText)}</div>
+          <button class="speak-btn" data-rus="${escapeHtml(word.rus)}">🔊 発音</button>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    appDiv.innerHTML = html;
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      currentView = 'main';
+      renderMainView();
+    });
+    document.getElementById('darkModeToggleDetail').addEventListener('click', toggleDarkMode);
+    document.getElementById('modeEngRusDetail').addEventListener('click', () => setDisplayMode('eng_rus'));
+    document.getElementById('modeAllDetail').addEventListener('click', () => setDisplayMode('all'));
+
+    document.querySelectorAll('.speak-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const rusText = btn.getAttribute('data-rus');
+        if(rusText) speakRussian(rusText);
+      });
+    });
+    currentView = 'detail';
+    updateTitleByMode();
+  }
+
+  function setDisplayMode(mode) {
+    displayMode = mode;
+    if (currentView === 'main') {
+      renderMainView();
+    } else {
+      showDetailView(currentCategory);
+    }
+  }
+
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    if (darkMode) {
+      document.body.classList.remove('light');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+    // ボタン文言（簡易的）
+    const btn = document.getElementById('darkModeToggle') || document.getElementById('darkModeToggleDetail');
+    if(btn) btn.textContent = darkMode ? '🌙 ダーク' : '☀️ ライト';
+  }
+
+  function updateTitleByMode() {
+    const titleEl = document.getElementById('mainTitle');
+    if(!titleEl) return;
+    if(displayMode === 'eng_rus') {
+      titleEl.textContent = '📖 RusCog | English → Русский';
+    } else {
+      titleEl.textContent = '📖 RusCog | 英・露・日 (Romaji)';
+    }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+      return c;
+    });
+  }
+
+  // テーマ初期化
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      darkMode = false;
+      document.body.classList.add('light');
+    } else {
+      darkMode = true;
+      document.body.classList.remove('light');
+    }
+  }
+
+  // サービスワーカー登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('ServiceWorker registered: ', reg);
+      }).catch(err => {
+        console.log('SW registration failed: ', err);
+      });
+    });
+  }
+
+  initTheme();
+  renderMainView();
+</script>
+</body>
+</html>

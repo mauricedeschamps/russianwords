@@ -1,0 +1,24 @@
+{
+  "name": "RusCog - ロシア語同根語学習",
+  "short_name": "RusCog",
+  "description": "英語とロシア語で似ている単語を効率的に学べるPWAアプリ",
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "#1e1e2f",
+  "background_color": "#1e1e2f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
