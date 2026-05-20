@@ -1,7 +1,7 @@
 {
-  "name": "RusCog - ロシア語同根語学習",
+  "name": "RusCog - Russian Cognates",
   "short_name": "RusCog",
-  "description": "英語とロシア語で似ている単語を効率的に学べるPWAアプリ",
+  "description": "Learn Russian vocabulary through English cognates",
   "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#1e1e2f",
